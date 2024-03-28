@@ -22,14 +22,14 @@ python3 -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
 
-Install required Python packages:
+Install required Python packages (in data-processing directory):
 ```
 pip install -r requirements.txt
 ```
 
 Navigate to the dataProject directory:
 ```
-cd data-processing/dataProject
+cd dataProject
 ```
 
 Set up the Django database:
@@ -49,7 +49,7 @@ The backend API will be available at http://127.0.0.1:8000/.
 ## Frontend Setup
 Navigate to the frontend directory:
 ```
-cd data-processing/frontend
+cd frontend
 ```
 
 Install the necessary npm packages:
