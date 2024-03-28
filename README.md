@@ -8,9 +8,9 @@ This web application leverages Python and Pandas to process and display data wit
 ### Prerequisites
 Ensure you have the following installed:
 
-Python 3.8 or higher
-Pip (Python package installer)
-Node.js and npm (Node package manager)
+* Python 3.8 or higher
+* Pip (Python package installer)
+* Node.js and npm (Node package manager)
 
 ## Backend Setup
 
@@ -69,10 +69,10 @@ The frontend will be available at http://localhost:3000/.
 5. View the processed data in a user-friendly format on the web application.
 
 ## Additional Information
-1. The data processing script handles a variety of data types and attempts to infer the most accurate types for each column in your dataset.
-2. If the script encounters columns with mixed types, it will make an educated guess based on the predominant type.
-3. For large files, the process may take some time. Please be patient as the application processes your data.
+* The data processing script handles a variety of data types and attempts to infer the most accurate types for each column in your dataset.
+* If the script encounters columns with mixed types, it will make an educated guess based on the predominant type.
+* For large files, the process may take some time. Please be patient as the application processes your data.
 
 ## Troubleshooting
-1. If you encounter any issues with the frontend, check that the backend server is running and accessible.
-2. For backend issues, ensure all dependencies are installed and database migrations are applied.
+* If you encounter any issues with the frontend, check that the backend server is running and accessible.
+* For backend issues, ensure all dependencies are installed and database migrations are applied.
