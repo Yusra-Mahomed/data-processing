@@ -27,6 +27,7 @@ def convert_to_datetime(df, col, date_formats):
     converted_col = None
     for date_format in date_formats:
         try:
+            # try to convert column to the date_format
             converted_col = pd.to_datetime(df[col], errors='coerce', format=date_format)
             if converted_col.notna().any():
                 break
@@ -90,7 +91,6 @@ def infer_and_convert_data_types(df):
     ]
 
     for col in df.columns:
-
         if df[col].dtype == object:
             df[col] = convert_to_datetime(df, col, date_formats)
 
@@ -157,11 +157,6 @@ def can_convert(col, conversion_function):
     except:
         return False
 
-# def preprocess_for_float_conversion(col):
-#     # Replace non-convertible text with NaN
-#     col = pd.to_numeric(col, errors='coerce')
-#     return col
-
 
 def override_data(df, column, new_type):
     print(f"Attempting to override column '{column}' to new type '{new_type}'.")
@@ -179,8 +174,6 @@ def override_data(df, column, new_type):
 
         if new_type in conversion_functions:
             # Check if all values can be converted without error
-            print("skjkd", column, new_type)
-            print(df[column].dtype)
             if can_convert(column, conversion_functions[new_type]):
                 df[column] = conversion_functions[new_type](column)
                 global column_type_overrides

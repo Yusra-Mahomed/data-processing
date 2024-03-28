@@ -51,7 +51,7 @@ function DataTypeOverrideComponent({ columnsWithTypes, onSubmitOverride }) {
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit}>
         <label>
-          Select Column: {/* Updated label text */}
+          Select Column: {}
           <select value={selectedColumn} onChange={e => setSelectedColumn(e.target.value)}>
             <option value="">Select Column</option>
             {columnsWithTypes.map((item, index) => (
@@ -60,7 +60,7 @@ function DataTypeOverrideComponent({ columnsWithTypes, onSubmitOverride }) {
           </select>
         </label>
         <label>
-          Select Data Type: {/* Updated label text */}
+          Select Data Type: {}
           <select value={newDataType} onChange={e => setNewDataType(e.target.value)}>
             <option value="">Select Data Type</option>
             {validDataTypes.map((type, index) => (

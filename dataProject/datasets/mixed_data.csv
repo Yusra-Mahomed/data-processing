@@ -1,7 +1,0 @@
-date,complex_number,timedelta,category,object,boolean,integer
-2024-03-28,3+4j,1 days,fruit,apple,True,10
-,5+2j,2 days,vegetable,tomato,False,20
-2024-03-30,1+6j,,fruit,banana,True,30
-2024-03-31,4+3j,4 days,,orange,False,40
-2024-04-01,2+5j,5 days,vegetable,,True,50
-2024-04-02,,7 days,,,False,

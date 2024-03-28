@@ -8,11 +8,7 @@ function App() {
   const [processedData, setProcessedData] = useState([]);
 
   const handleUploadSuccess = async (data) => {
-   
-    console.log("plsss", data)
-    console.log(data.processed_data[0])
     setProcessedData(data);
-    console.log("again", processedData)
   };
 
   const handleOverrideSuccess = (newProcessedData, newColumnsWithTypes) => {
@@ -25,6 +21,7 @@ function App() {
 
   return (
     <div>
+      <h1>Data Processing and inference</h1>
       <h2>Upload a File</h2>
       <FileUploadComponent onUploadSuccess={handleUploadSuccess} />
       <DataTableComponent processedData={processedData} 

@@ -4,7 +4,7 @@ import DataTypeOverrideComponent from './DataTypeOverrideComponent';
 function DataTableComponent({ processedData, onOverrideSuccess }) {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(8); // Or any other number
+  const [itemsPerPage] = useState(8); // Or any other number
 
   if (!processedData || processedData.length === 0) return null;
 
@@ -28,52 +28,55 @@ function DataTableComponent({ processedData, onOverrideSuccess }) {
   return (
     <div>
       <h2>Processed Data Results</h2>
-      <table>
-        <thead>
-          <tr>
-            {processedData.columns_with_types.map((item, index) => (
-              <th key={index}>{item.column}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {processedData.columns_with_types.map((item, colIndex) => (
-                <td key={colIndex}>
-                  {typeof row[item.column] === 'boolean' ? row[item.column].toString() : row[item.column]}
-                </td>
+      <div className="data-results-container"> {/* New wrapper div */}
+        <div className="data-table-wrapper"> {/* New wrapper div for the table */}
+          <table>
+            <thead>
+              <tr>
+                {processedData.columns_with_types.map((item, index) => (
+                  <th key={index}>{item.column}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {processedData.columns_with_types.map((item, colIndex) => (
+                    <td key={colIndex}>
+                      {typeof row[item.column] === 'boolean' ? row[item.column].toString() : row[item.column]}
+                    </td>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="pagination-controls">
-        <button onClick={() => paginate(1)} disabled={currentPage === 1}>
-          First
-        </button>
-        <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
-          Previous
-        </button>
-        <span>Page {currentPage} of {totalPages}</span>
-        <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>
-          Next
-        </button>
-        <button onClick={() => paginate(totalPages)} disabled={currentPage === totalPages}>
-          Last
-        </button>
+            </tbody>
+            </table>
+          <div className="pagination-controls">
+            <button onClick={() => paginate(1)} disabled={currentPage === 1}>
+              First
+            </button>
+            <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
+              Previous
+            </button>
+            <span>Page {currentPage} of {totalPages}</span>
+            <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>
+              Next
+            </button>
+            <button onClick={() => paginate(totalPages)} disabled={currentPage === totalPages}>
+              Last
+            </button>
+          </div>
       </div>
-      <div className="datatype-info">
-        <h3>Data Types for Each Column</h3>
-        <ul>
-          {processedData.columns_with_types.map((item, index) => (
-            <li key={index}>
-              <strong>{item.column}</strong>: {item.data_type}
-            </li>
-          ))}
-        </ul>
+        <div className="datatype-info">
+          <h3>Data Types for Each Column</h3>
+          <ul>
+            {processedData.columns_with_types.map((item, index) => (
+              <li key={index}>
+                <strong>{item.column}</strong>: {item.data_type}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-      
       <DataTypeOverrideComponent columnsWithTypes={processedData.columns_with_types} onSubmitOverride={handleOverride} />
     </div>
     

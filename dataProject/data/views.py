@@ -27,6 +27,8 @@ def upload_file(request):
             else:
                 return JsonResponse({'error': 'Unsupported file format. Only .csv and .xlsx are supported.'}, status=400)
 
+            # get processed data
+            # convert data types to user friendly names
             processed_df = infer_and_convert_data_types(df)
             processed_data_list = serialise_dataframe(processed_df)
             columns_with_types = [{'column': col, 'data_type': get_user_friendly_dtype(dtype)} for col, dtype in zip(processed_df.columns, processed_df.dtypes)]
