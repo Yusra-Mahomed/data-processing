@@ -1,0 +1,6 @@
+index,boolean,timedelta,complex_number
+0,True,2 days,1+2j
+1,False,15 min,3+4j
+2,True,10 s,2-3j
+3,False,-5 days,0-1j
+4,True,12 hours,1-2j
