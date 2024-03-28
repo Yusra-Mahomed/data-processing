@@ -8,9 +8,11 @@ This web application leverages Python and Pandas to process and display data wit
 ### Prerequisites
 Ensure you have the following installed:
 
-* Python 3.8 or higher
+* Python 3.x (3.7 or higher)
 * Pip (Python package installer)
 * Node.js and npm (Node package manager)
+* Python 3.x
+* Django
 
 ## Backend Setup
 
