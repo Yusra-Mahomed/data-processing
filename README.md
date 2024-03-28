@@ -16,11 +16,6 @@ Ensure you have the following installed:
 
 ## Backend Setup
 
-Navigate to the dataProject directory:
-```
-cd data-processing/dataProject
-```
-
 Create a virtual environment (optional but recommended):
 ```
 python3 -m venv venv
@@ -30,6 +25,11 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 Install required Python packages:
 ```
 pip install -r requirements.txt
+```
+
+Navigate to the dataProject directory:
+```
+cd data-processing/dataProject
 ```
 
 Set up the Django database:
@@ -49,7 +49,7 @@ The backend API will be available at http://127.0.0.1:8000/.
 ## Frontend Setup
 Navigate to the frontend directory:
 ```
-cd frontend
+cd data-processing/frontend
 ```
 
 Install the necessary npm packages:
