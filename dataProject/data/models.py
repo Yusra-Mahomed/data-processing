@@ -5,6 +5,8 @@ class Dataset(models.Model):
     file_name = models.CharField(max_length=255)
     processed_at = models.DateTimeField(null=True, blank=True)
     original_file = models.FileField(upload_to='datasets/')
+    processed_data = models.TextField(blank=True, null=True) 
+    processed_file_pkl = models.BinaryField(null=True, blank=True)
 
     def str(self):
         return self.file_name
