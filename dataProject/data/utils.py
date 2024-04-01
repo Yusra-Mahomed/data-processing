@@ -4,6 +4,8 @@ import numpy as np
 import traceback
 from dateutil import parser
 from dateutil.parser import ParserError
+from .conversions import is_allowed_none, convert_to_boolean, convert_to_categorical, convert_to_datetime, convert_to_numeric, convert_to_timedelta, convert_to_complex, looks_like_number
+from .typechecks import is_category, is_complex, is_timedelta, looks_like_number, can_parse_date
 
 column_type_overrides = {}
 
@@ -116,193 +118,8 @@ column_type_overrides = {}
 
 #     return df
 
-
-def is_allowed_none(val):
-    return pd.isnull(val) or str(val).strip().lower() in ALLOWED_NONE_TYPES
-
-
-ALLOWED_NONE_TYPES = [
-    "nan",
-    "na",
-    "n/a",
-    "none",
-    "null",
-    "missing",
-    "miss",
-    "unknow",
-    "unk",
-    "-999",
-    "not available",
-    ''
-]
-
-def convert_to_categorical(df, col, is_category):
-    if is_category(df[col]):
-        return df[col].astype('category')
-    return df[col]
-
-def convert_to_datetime(df, col):
-    try:
-        converted_col = []
-        for value in df[col]:
-            if pd.isnull(value) or is_allowed_none(value):
-                converted_col.append(pd.NaT)  # Append NaT for null values and allowed none types
-            else:
-                converted_col.append(parser.parse(str(value), fuzzy=True))
-        return pd.Series(converted_col)
-    except Exception as e:
-        print(f"Error converting column '{col}' to datetime: {e}")
-        return df[col]
     
-def convert_to_timedelta(df, col):
-    try:
-        converted_col = pd.to_timedelta(df[col], errors='coerce')
-        return converted_col
-    except Exception as e:
-        print(f"Error converting column '{col}' to timedelta: {e}")
-        return df[col]
-
-def convert_to_numeric(df, col):
-    try:
-        # First, check if there are complex numbers in the column
-        if df[col].apply(lambda x: is_complex(str(x))).any():
-            raise ValueError(f"Column '{col}' contains complex numbers, cannot convert to numeric.")
-        
-        # Convert values that look like a number or percentage to decimals, else set to NaN
-        df[col] = df[col].apply(
-            lambda x: float(str(x).replace(',', '').strip('%')) / 100 
-            if isinstance(x, str) and x.endswith('%') 
-            else float(str(x).replace(',', '')) 
-            if isinstance(x, str) and looks_like_number(x) 
-            else x  # Keep the original value if it's not a string
-        )
-        
-        # Now that the column is cleaned up, coerce any stragglers to NaN
-        converted_col = pd.to_numeric(df[col], errors='coerce')
-        print(f"Converted {col} dtype: {converted_col.dtype}")  # Diagnostic print
-        return converted_col
-    
-    except Exception as e:
-        raise ValueError(f"Error converting column '{col}' to numeric: {e}")
-
-
-def convert_to_boolean(df, col):
-    bool_variable_map = {
-        "true": True,
-        "false": False,
-        "1": True,
-        "0": False,
-        "yes": True,
-        "no": False,
-        "t": True,
-        "f": False,
-        "on": True,
-        "off": False,
-        "none": None,
-    }
-
-    # Check if all values can be converted
-    if not df[col].apply(lambda x: str(x).lower() in bool_variable_map or pd.isnull(x)).all():
-        raise ValueError(f"Column '{col}' contains values that cannot be converted to boolean.")
-
-    try:
-        # Convert the column using the mapping
-        converted_col = df[col].apply(lambda x: bool_variable_map[str(x).lower()] if pd.notnull(x) else x)
-        # Convert None explicitly to pd.NA to handle nullable boolean types
-        converted_col = converted_col.where(pd.notnull(converted_col), pd.NA)
-        return converted_col.astype("boolean")  # Use Pandas' nullable boolean type
-    except Exception as e:
-        raise ValueError(f"Error converting column '{col}' to boolean: {e}")
-
-    
-def convert_to_complex(df, col):
-    try:
-        # Check if any value in the column is a complex number
-        if df[col].apply(lambda x: isinstance(x, complex) or isinstance(x, str) and '+' in x and 'j' in x).any():
-            converted_col = df[col].apply(lambda x: complex(x) if pd.notna(x) else x)
-            return converted_col
-        else:
-            return df[col]  # If no complex numbers found, return original column
-    except Exception as e:
-        print(f"Error converting column '{col}' to complex: {e}")
-        return df[col]
-
-def is_timedelta(column):
-    patterns = [
-        r'\d+\s*years?',
-        r'\d+\s*months?',
-        r'\d+\s*weeks?',
-        r'\d+\s*days?',
-        r'\d+\s*hours?',
-        r'\d+\s*minutes?',
-        r'\d+\s*seconds?',
-    ]
-    
-    for pattern in patterns:
-        if column.str.contains(pattern, case=False, regex=True).any():
-            return True
-    
-    return False
-
-def is_category(col: pd.Series, max_unique_ratio=0.5):
-    series = col.dropna()
-    # Check if series is not empty
-    if len(series) > 0:  
-        unique_ratio = len(series.unique()) / len(series)
-         # Check if unique value ratio is below or equal to the threshold
-        if unique_ratio <= max_unique_ratio: 
-            return True
-    return False
-
-def is_complex(col: pd.Series):
-    try:
-        # Attempt to convert each value to complex
-        for value in col.dropna():
-            complex(value)  
-    except (ValueError, TypeError):
-        return False
-    return True
-
-
-
-def is_complex(val):
-    if isinstance(val, complex):
-        return True
-    if isinstance(val, str):
-        # Match strings that are in the form of a complex number (a + bi)
-        match = re.match(r'^([+-]?[\d.]+)?([+-]?[\d.]+j)$', val.strip().replace(' ', ''))
-        return bool(match)
-    return False
-
-
-def is_timedelta(string):
-    # Patterns for different time units
-    patterns = [
-        r'\b\d+\s*years?\b',
-        r'\b\d+\s*months?\b',
-        r'\b\d+\s*weeks?\b',
-        r'\b\d+\s*days?\b',
-        r'\b\d+\s*hours?\b',
-        r'\b\d+\s*minutes?\b',
-        r'\b\d+\s*seconds?\b',
-    ]
-    return any(re.search(pattern, string, re.IGNORECASE) for pattern in patterns)
-
-def looks_like_number(val):
-    if pd.isna(val):
-        return False
-    if isinstance(val, (int, float, np.number)):
-        return True
-    if isinstance(val, str):
-        # remove commas
-        val = val.replace(',', '').strip()
-        # Check for a percentage at the end of the string and remove it
-        if val.endswith('%'):
-            val = val[:-1]
-        # This regex will match any string that represents an int or float, negative or positive
-        if re.match(r'^-?\d+(?:\.\d+)?$', val):
-            return True
-    return False
+# Checking functions
 
 
 def normalise_boolean(val):
@@ -313,41 +130,7 @@ def normalise_boolean(val):
     elif str(val).lower() in false_values:
         return False
     else:
-        return pd.NA  # Use pandas NA for undefined or unconvertible values
-
-
-def can_parse_date(string):
-    try:
-        # Attempt to parse the string as a date.
-        result = parser.parse(string, fuzzy=False)
-        
-        # Check if the result is really a date by ensuring it doesn't match certain non-date patterns
-        non_date_patterns = [
-            r"^\d+$",  # Strings that are only digits are not dates.
-            r"[a-zA-Z]",  # Strings containing letters that were not parsed into a month name are not dates.
-            r"^-?\d+(\.\d+)?$",  # Strings that represent a float number are not dates.
-            # Add any more patterns that are known to be not dates.
-        ]
-        if any(re.search(pattern, string) for pattern in non_date_patterns):
-            return False
-        # If the date was parsed without fuzzy logic, it is likely a valid date.
-        return True
-    except (parser.ParserError, TypeError, ValueError):
-        # If the parsing fails, it's not a date.
-        return False
-    
-def preprocess_for_float_conversion(col):
-    """
-    Preprocesses a pandas Series for float conversion by replacing non-convertible values with NaN.
-
-    Parameters:
-    - col (pd.Series): The pandas Series to preprocess.
-
-    Returns:
-    - pd.Series: The preprocessed Series ready for float conversion.
-    """
-    col = pd.to_numeric(col, errors='coerce')
-    return col
+        return pd.NA  
 
 
 def infer_data_type(col):
@@ -362,6 +145,17 @@ def infer_data_type(col):
     # Normalise None values
     col_cleaned = col_cleaned.apply(lambda x: None if is_allowed_none(x) else x)
 
+    # Numeric type threshold check (this is for mixed types)
+    numeric_count = sum(looks_like_number(x) for x in col_cleaned.dropna())
+    if numeric_count / len(col_cleaned.dropna()) > 1:
+        return 'Decimal'
+    
+    # Count the number of boolean entries
+    boolean_count = sum(isinstance(x, bool) for x in col_cleaned.dropna())
+    if boolean_count / len(col_cleaned.dropna()) > 1:
+        return 'Boolean'
+    
+    
     print(f"Cleaned {col.name}:", col_cleaned.tolist())  # Debug print statement
 
     if all(isinstance(x, bool) for x in col_cleaned.dropna()):
@@ -374,7 +168,7 @@ def infer_data_type(col):
         return 'Time Duration'
     if any(can_parse_date(str(x)) for x in col.dropna()):
         return 'Date'
-    if len(set(col.dropna())) < len(col.dropna()) / 2:
+    if is_category(col_cleaned):
         return 'Category'
     if all(isinstance(x, str) for x in col.dropna()):
         return 'Text'
@@ -452,14 +246,14 @@ def override_data(df, column, new_type):
     print(f"Attempting to override column '{column}' to new type '{new_type}'.")
     try:
         conversion_functions = {
-            'Date': lambda col: pd.to_datetime(df[col], errors='raise'),
+            'Date': lambda col: convert_to_datetime(df, col),
             'Integer': lambda col: pd.to_numeric(df[col], errors='raise').astype('Int64'),
-            'Decimal':  lambda col: pd.to_numeric(df[col].replace('Not Available', np.nan), errors='raise'),
+            'Decimal': lambda col: convert_to_numeric(df, col),  # Using convert_to_numeric for Decimal as well
             'Time Duration': lambda col: pd.to_timedelta(df[col], errors='raise'),
-            'Boolean': lambda col: df[col].astype(bool),
+            'Boolean': lambda col: convert_to_boolean(df, col),
             'Complex Number': lambda col: df[col].apply(lambda x: complex(x) if pd.notna(x) else x),
-            'Category': lambda col: df[col].astype('category'),
-            'Text': lambda col: df[col].astype(str) 
+            'Category': lambda col: convert_to_categorical(df, col, is_category),  # Note: Ensure you have an is_category function defined
+            'Text': lambda col: df[col].astype(str)
         }
 
         if new_type in conversion_functions:
