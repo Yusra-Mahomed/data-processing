@@ -21,7 +21,7 @@ function FileUploadComponent({ onUploadSuccess }) {
     formData.append('datafile', file);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/data/upload/', formData, {
+      const response = await axios.post('https://data-processing-backend.onrender.com/data/upload/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
