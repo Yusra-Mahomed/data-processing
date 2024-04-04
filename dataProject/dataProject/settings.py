@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'data-processing.onrender.com'
+    'data-processing-backend.onrender.com'
 ]
 
 
