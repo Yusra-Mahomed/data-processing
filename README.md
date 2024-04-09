@@ -14,6 +14,8 @@ Ensure you have the following installed:
 * Python 3.x
 * Django
 
+Deployed link:  https://data-processing.onrender.com/ 
+
 ## Backend Setup
 
 Create a virtual environment (optional but recommended):
@@ -22,15 +24,16 @@ python3 -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
 
-Install required Python packages (in data-processing directory):
-```
-pip install -r requirements.txt
-```
-
 Navigate to the dataProject directory:
 ```
 cd dataProject
 ```
+
+Install required Python packages:
+```
+pip install -r requirements.txt
+```
+
 
 Set up the Django database:
 ```
